@@ -14,6 +14,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Shader.h"
+
 /* Window size */
 float screenWidth = 750.0f;
 float screenHeight = 750.0f;
@@ -38,6 +40,10 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
     gladLoadGL();
+
+    /* Initialize shader object */
+    Shader mainShader = Shader("Shaders/main.vert", "Shaders/main.frag");
+    mainShader.useShaderProgram();
 
     while (!glfwWindowShouldClose(window))
     {
