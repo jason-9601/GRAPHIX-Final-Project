@@ -67,3 +67,7 @@ void Shader::checkCompilationStatus(GLuint shader, const char* shaderType) {
         std::cout << "Successfully compiled " << shaderType << " shader" << std::endl;
     }
 }
+
+GLuint Shader::getID() {
+    return this->shaderProgramID;
+}

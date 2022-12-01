@@ -135,12 +135,15 @@
   <ItemGroup>
     <ClCompile Include="finalproject.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="Model3D.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Model3D.h" />
+    <ClInclude Include="MyCamera.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="tiny_obj_loader.h" />

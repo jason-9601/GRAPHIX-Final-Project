@@ -21,6 +21,6 @@ public:
 
     void checkCompilationStatus(GLuint shader, const char* shaderType);
 
-    /* TODO: functions for setting vectors */
+    GLuint getID();
 
 };
