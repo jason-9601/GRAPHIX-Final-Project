@@ -49,7 +49,7 @@ class MyCamera {
     }
 
     // returns the view matrix which only looks at or rotates at main object 
-    glm::mat4 GetViewMatrix()
+    glm::mat4 GetViewMatrixThird()
     {
         const float radius = 10.0f;
         float camX = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch)) * radius;
@@ -57,6 +57,12 @@ class MyCamera {
         float camZ = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch)) * radius;
 
         return glm::lookAt(glm::vec3(camX, camY, camZ), Front, Up);
+    }
+
+    glm::mat4 GetViewMatrixFirst()
+    {
+
+        return glm::lookAt(Position, Position + Front, Up);
     }
 
     // processes mouse movement from main cpp

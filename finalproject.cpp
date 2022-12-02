@@ -31,15 +31,31 @@ float lastX = 300, lastY = 300; // last mouse position (initalized to be in cent
 // camera
 PerspectiveCamera pcam;
 OrthoCamera ocam;
-MyCamera camera(glm::vec3(0.0f, 0.0f, 5.f), glm::vec3(0.0f, 1.0f, 0.0f));
+MyCamera camera(glm::vec3(0.0f, 0.0f, 10.f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 // for determining if perspective cam or ortho cam
-glm::mat4 wow;
+glm::mat4 projection_matrix;
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f; // time of last frame
 
+bool isTrue = true;
+
+
+void Key_Callback(GLFWwindow* window,
+    int key,
+    int scanCode,
+    int action,
+    int mods
+)
+{
+    // press spacebar to switch control of main object and light source
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+    {
+        isTrue = !isTrue;
+    }
+}
 
 int main(void)
 {
@@ -97,7 +113,7 @@ int main(void)
 
     /* For keyboard events */
     /* TODO: The Player ship can be controlled using WASDQE */
-    /*glfwSetKeyCallback(window, Key_Callback);*/
+    glfwSetKeyCallback(window, Key_Callback);
 
     /* For mouse events */
     /* TODO: The view can be controlled by using the mouse */
@@ -138,6 +154,9 @@ int main(void)
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)(6 * sizeof(GLfloat)));
     glEnableVertexAttribArray(2);
 
+    glm::mat4 projection_matrix = pcam.GetPer();
+    
+    glm::mat4 viewMatrix;
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -146,8 +165,13 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* Get projection and view matrix from perspective camera */
-        glm::mat4 projection_matrix = pcam.GetPer();
-        glm::mat4 viewMatrix = camera.GetViewMatrix();
+        if (isTrue) {
+            viewMatrix = camera.GetViewMatrixThird();
+        }
+        else {
+            viewMatrix = camera.GetViewMatrixFirst();
+        }
+        
 
         /* Set uniforms in shaders */
         unsigned int projectionLoc = glGetUniformLocation(mainShader.getID(), "projection");
@@ -184,14 +208,15 @@ void processInput(GLFWwindow* window)
     // perspective view
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
     {
-        wow = pcam.GetPer();
+        projection_matrix = pcam.GetPer();
     }
     // orthographic view
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
     {
-        wow = ocam.GetOrtho();
+        projection_matrix = ocam.GetOrtho();
         const float nice = 90.f;
         camera.Pitch = nice;
+        isTrue = true;
     }
 
 }
