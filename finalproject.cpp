@@ -15,12 +15,31 @@
 #include "Model3D.h"
 #include "MyCamera.h"
 
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void processInput(GLFWwindow* window);
+
 /* Window size */
 float screenWidth = 750.0f;
 float screenHeight = 750.0f;
 
 /* Camera */
-PerspectiveCamera perspectiveCamera;
+float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch = 0.0f;
+bool firstMouse = true;
+float lastX = 300, lastY = 300; // last mouse position (initalized to be in center of screen)
+
+// camera
+PerspectiveCamera pcam;
+OrthoCamera ocam;
+MyCamera camera(glm::vec3(0.0f, 0.0f, 5.f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+// for determining if perspective cam or ortho cam
+glm::mat4 wow;
+
+// timing
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f; // time of last frame
+
 
 int main(void)
 {
@@ -78,18 +97,19 @@ int main(void)
 
     /* For keyboard events */
     /* TODO: The Player ship can be controlled using WASDQE */
-    //glfwSetKeyCallback(window, Key_Callback);
+    /*glfwSetKeyCallback(window, Key_Callback);*/
 
     /* For mouse events */
     /* TODO: The view can be controlled by using the mouse */
-    //glfwSetCursorPosCallback(window, Mouse_Callback);
+    glfwSetCursorPosCallback(window, mouse_callback); 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     /* Initialize shader object */
     Shader mainShader = Shader("Shaders/main.vert", "Shaders/main.frag");
     mainShader.useShaderProgram();
 
     /* Create object for testing */
-    Model3D testObj = Model3D("3D/cat.obj", 0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 270.0f);
+    Model3D testObj = Model3D("3D/cat.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 270.0f);
     testObj.rotate_on_axis(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 
     GLuint VAO, VBO;
@@ -120,12 +140,14 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
+        processInput(window);
+
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* Get projection and view matrix from perspective camera */
-        glm::mat4 projection_matrix = perspectiveCamera.GetPer();
-        glm::mat4 viewMatrix = perspectiveCamera.GetViewMatrix();
+        glm::mat4 projection_matrix = pcam.GetPer();
+        glm::mat4 viewMatrix = camera.GetViewMatrix();
 
         /* Set uniforms in shaders */
         unsigned int projectionLoc = glGetUniformLocation(mainShader.getID(), "projection");
@@ -153,4 +175,45 @@ int main(void)
     
     glfwTerminate();
     return 0;
+}
+
+void processInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+    // perspective view
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+    {
+        wow = pcam.GetPer();
+    }
+    // orthographic view
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+    {
+        wow = ocam.GetOrtho();
+        const float nice = 90.f;
+        camera.Pitch = nice;
+    }
+
+}
+
+// for mouse movement
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset);
 }

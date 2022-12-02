@@ -51,7 +51,7 @@ class MyCamera {
     // returns the view matrix which only looks at or rotates at main object 
     glm::mat4 GetViewMatrix()
     {
-        const float radius = 5.0f;
+        const float radius = 10.0f;
         float camX = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch)) * radius;
         float camY = sin(glm::radians(Pitch)) * radius;
         float camZ = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch)) * radius;
