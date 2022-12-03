@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClInclude Include="Model3D.h" />
     <ClInclude Include="MyCamera.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="tiny_obj_loader.h" />
