@@ -79,8 +79,8 @@ int main(void)
     gladLoadGL();
 
     /* Variables for texture initialization */
-    const int textures_count = 1;
-    const char* texture_filenames[textures_count] = { "3D/cat_texture.jpg" };
+    const int textures_count = 2;
+    const char* texture_filenames[textures_count] = { "3D/cat_texture.jpg", "3D/dolphin_texture.jpg"};
 
     int img_width, img_height, color_channels;
 
@@ -128,31 +128,23 @@ int main(void)
     Model3D testObj = Model3D("3D/cat.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 270.0f);
     testObj.rotate_on_axis(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 
-    GLuint VAO, VBO;
+    Model3D dolphinObj = Model3D("3D/dolphin.obj", 0.0f, 5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f);
+    dolphinObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    
+    const int modelCount = 2;
+    GLuint VAO[modelCount], VBO[modelCount];
 
-    /* Setup VAO for test object */
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
+    /* Setup VAO and VBOs */
+    glGenVertexArrays(modelCount, VAO);
+    glGenBuffers(modelCount, VBO);
+    
+    /* Draw Cat */
+    glBindVertexArray(VAO[0]);
+    testObj.init_buffers(VAO[0], VBO[0]);
 
-    /* Bind VBO */
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER,
-        sizeof(GL_FLOAT) * testObj.fullVertexData.size(),
-        testObj.fullVertexData.data(),
-        GL_STATIC_DRAW);
-
-    /* Position */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    /* Normals */
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)(3 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(1);
-
-    /* Texture */
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)(6 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(2);
+    /* Draw Dolphin */
+    glBindVertexArray(VAO[1]);
+    dolphinObj.init_buffers(VAO[1], VBO[1]);
 
     glm::mat4 projection_matrix = pcam.GetPer();
     
@@ -188,7 +180,11 @@ int main(void)
         /* Draw object with texture */
         glBindTexture(GL_TEXTURE_2D, textures[0]);
         glActiveTexture(GL_TEXTURE0);
-        testObj.draw(transformationLoc, 0, testObj.fullVertexData.size() / 8, VAO);
+        testObj.draw(transformationLoc, 0, testObj.fullVertexData.size() / 8, VAO[0]);
+
+        glBindTexture(GL_TEXTURE_2D, textures[1]);
+        glActiveTexture(GL_TEXTURE0);
+        dolphinObj.draw(transformationLoc, 0, dolphinObj.fullVertexData.size() / 8, VAO[1]);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

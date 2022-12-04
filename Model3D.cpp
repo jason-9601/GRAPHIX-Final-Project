@@ -92,6 +92,28 @@ void Model3D::rotate_on_axis(float rotateAngle, glm::vec3 rotateAxis) {
         rotateAxis);
 }
 
+/* Initialize buffers for obj with position, normals, and texture */
+void Model3D::init_buffers(unsigned int VAO, unsigned int VBO) {
+    /* Bind VBO */
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER,
+        sizeof(GL_FLOAT) * this->fullVertexData.size(),
+        this->fullVertexData.data(),
+        GL_STATIC_DRAW);
+
+    /* Position */
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    /* Normals */
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
+
+    /* Texture */
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)(6 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2);
+}
+
 /* Pass in the uniform location for transformation as a parameter */
 void Model3D::draw(unsigned int transformationLoc, unsigned int startIndex, unsigned int size, unsigned int VAO) {
     glUniformMatrix4fv(transformationLoc, 1, GL_FALSE, glm::value_ptr(this->transformation_matrix));

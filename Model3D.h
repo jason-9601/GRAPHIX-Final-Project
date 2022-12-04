@@ -30,6 +30,8 @@ public:
 
     void rotate_on_axis(float rotateAngle, glm::vec3 rotateAxis);
 
+    void init_buffers(unsigned int VAO, unsigned int VBO);
+
     void draw(unsigned int transformationLoc, unsigned int startIndex, unsigned int size, unsigned int VAO);
 
 };
