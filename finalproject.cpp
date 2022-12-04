@@ -14,6 +14,7 @@
 #include "Shader.h"
 #include "Model3D.h"
 #include "MyCamera.h"
+#include "Light.h"
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow* window);
@@ -42,6 +43,14 @@ float lastFrame = 0.0f; // time of last frame
 
 bool isPers = true;
 bool isOrtho = false;
+
+// lights (pointlight and directional)
+PointLight plight(glm::vec3(0, 0, 5));
+DirectionalLight dlight(glm::vec3(4.f, 11.f, -3.f));
+
+// point light & directional light intensity
+float plight_str = .05f;
+float dlight_str = .3f;
 
 
 void Key_Callback(GLFWwindow* window,
@@ -289,6 +298,13 @@ int main(void)
     glm::mat4 projection_matrix = pcam.GetPer();
     
     glm::mat4 viewMatrix;
+
+    float constant = .01f; // light constant
+    float linear = 0.009f; // light linear
+    float quadratic = 0.0032f; // light quadratic
+
+    glm::vec3 ambientColor = glm::vec3(1, 1, 1);
+
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -327,6 +343,65 @@ int main(void)
         
         /* Render models, use the main shader files */
         mainShader.useShaderProgram();
+
+        // setting point light data
+        plight.LightData(glm::vec3(plight_str, plight_str, plight_str), constant, linear, quadratic, .01f, glm::vec3(1, 1, 1), .01f, .5f);
+        // setting directional light data
+        dlight.LightData(glm::vec3(dlight_str, dlight_str, dlight_str), 0, 0, 0, .5f, ambientColor, .01f, .5f);
+        
+        // point light data to transfer to shader program
+        unsigned int lightPosLoc = glGetUniformLocation(mainShader.getID(), "lightPos");
+        glUniform3fv(lightPosLoc, 1, glm::value_ptr(plight.lightPos));
+
+        unsigned int colorLoc = glGetUniformLocation(mainShader.getID(), "ourColor");
+        glUniform3fv(colorLoc, 1, glm::value_ptr(glm::vec3(1,1,1)));
+
+        unsigned int lightColorLoc = glGetUniformLocation(mainShader.getID(), "lightColor");
+        glUniform3fv(lightColorLoc, 1, glm::value_ptr(plight.lightColor));
+
+        unsigned int constantLoc = glGetUniformLocation(mainShader.getID(), "constant");
+        glUniform1f(constantLoc, plight.constant);
+
+        unsigned int linearLoc = glGetUniformLocation(mainShader.getID(), "linear");
+        glUniform1f(linearLoc, plight.linear);
+
+        unsigned int quadraticLoc = glGetUniformLocation(mainShader.getID(), "quadratic");
+        glUniform1f(quadraticLoc, plight.quadratic);
+
+        unsigned int ambientStrLoc = glGetUniformLocation(mainShader.getID(), "ambientStr");
+        glUniform1f(ambientStrLoc, plight.ambientStr);
+
+        unsigned int ambientColorLoc = glGetUniformLocation(mainShader.getID(), "ambientColor");
+        glUniform3fv(ambientColorLoc, 1, glm::value_ptr(plight.ambientColor));
+
+        unsigned int cameraPosLoc = glGetUniformLocation(mainShader.getID(), "cameraPos");
+        glUniform3fv(cameraPosLoc, 1, glm::value_ptr(camera.Position));
+
+        unsigned int specStrLoc = glGetUniformLocation(mainShader.getID(), "specStr");
+        glUniform1f(specStrLoc, plight.specStr);
+
+        unsigned int specPhogLoc = glGetUniformLocation(mainShader.getID(), "specPhong");
+        glUniform1f(specPhogLoc, plight.specPhong);
+
+        // directional light data to transfer to shader program
+
+        unsigned int dirlightPosLoc = glGetUniformLocation(mainShader.getID(), "direction");
+        glUniform3fv(dirlightPosLoc, 1, glm::value_ptr(dlight.direction));
+
+        unsigned int dirlightColorLoc = glGetUniformLocation(mainShader.getID(), "dirlightColor");
+        glUniform3fv(dirlightColorLoc, 1, glm::value_ptr(dlight.lightColor));
+
+        unsigned int dirambientStrLoc = glGetUniformLocation(mainShader.getID(), "dirambientStr");
+        glUniform1f(dirambientStrLoc, dlight.ambientStr);
+
+        unsigned int dirambientColorLoc = glGetUniformLocation(mainShader.getID(), "dirambientColor");
+        glUniform3fv(dirambientColorLoc, 1, glm::value_ptr(dlight.ambientColor));
+
+        unsigned int dirspecStrLoc = glGetUniformLocation(mainShader.getID(), "dirspecStr");
+        glUniform1f(dirspecStrLoc, dlight.specStr);
+
+        unsigned int dirspecPhogLoc = glGetUniformLocation(mainShader.getID(), "dirspecPhong");
+        glUniform1f(dirspecPhogLoc, dlight.specPhong);
 
         /* Set uniforms in shaders */
         unsigned int projectionLoc = glGetUniformLocation(mainShader.getID(), "projection");
