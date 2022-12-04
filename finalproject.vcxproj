@@ -142,6 +142,7 @@
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Model3D.h" />
     <ClInclude Include="MyCamera.h" />
     <ClInclude Include="Player.h" />
