@@ -40,7 +40,8 @@ glm::mat4 projection_matrix;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f; // time of last frame
 
-bool isTrue = true;
+bool isPers = true;
+bool isOrtho = false;
 
 
 void Key_Callback(GLFWwindow* window,
@@ -51,9 +52,15 @@ void Key_Callback(GLFWwindow* window,
 )
 {
     // press spacebar to switch control of main object and light source
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_1))
     {
-        isTrue = !isTrue;
+        isPers = !isPers;
+        isOrtho = false;
+    }
+    if (glfwGetKey(window, GLFW_KEY_2))
+    {
+        isOrtho = true;
+        isPers = false;
     }
 }
 
@@ -157,7 +164,7 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* Get projection and view matrix from perspective camera */
-        if (isTrue) {
+        if (isPers || isOrtho) {
             viewMatrix = camera.GetViewMatrixThird();
         }
         else {
@@ -205,6 +212,7 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
     {
         projection_matrix = pcam.GetPer();
+        
     }
     // orthographic view
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
@@ -212,7 +220,7 @@ void processInput(GLFWwindow* window)
         projection_matrix = ocam.GetOrtho();
         const float nice = 90.f;
         camera.Pitch = nice;
-        isTrue = true;
+        
     }
 
 }
