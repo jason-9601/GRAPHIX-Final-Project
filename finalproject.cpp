@@ -133,6 +133,112 @@ int main(void)
     Shader mainShader = Shader("Shaders/main.vert", "Shaders/main.frag");
     mainShader.useShaderProgram();
 
+    Shader skyboxShader = Shader("Shaders/skybox.vert", "Shaders/skybox.frag");
+    skyboxShader.useShaderProgram();
+
+    /* Vertices for the cube */
+    float skyboxVertices[]{
+        -1.f, -1.f, 1.f, //0
+        1.f, -1.f, 1.f,  //1
+        1.f, -1.f, -1.f, //2
+        -1.f, -1.f, -1.f,//3
+        -1.f, 1.f, 1.f,  //4
+        1.f, 1.f, 1.f,   //5
+        1.f, 1.f, -1.f,  //6
+        -1.f, 1.f, -1.f  //7
+    };
+
+    /* Skybox Indices */
+    unsigned int skyboxIndices[]{
+        1,2,6,
+        6,5,1,
+
+        0,4,7,
+        7,3,0,
+
+        4,5,6,
+        6,7,4,
+
+        0,3,2,
+        2,1,0,
+
+        0,1,5,
+        5,4,0,
+
+        3,7,6,
+        6,2,3
+    };
+
+    GLuint skyboxVAO, skyboxVBO, skyboxEBO;
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glGenBuffers(1, &skyboxEBO);
+
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER,
+        sizeof(skyboxVertices),
+        &skyboxVertices,
+        GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+        3 * sizeof(float), (void*)0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+        sizeof(GL_INT) * 36,
+        &skyboxIndices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    
+    std::string facesSkybox[]{
+        "Skybox/uw_lf.jpg",
+        "Skybox/uw_rt.jpg",
+        "Skybox/uw_up.jpg",
+        "Skybox/uw_dn.jpg",
+        "Skybox/uw_ft.jpg",
+        "Skybox/uw_bk.jpg", 
+    };
+
+    /* Create the cube map */
+    unsigned int skyboxTexture;
+    glGenTextures(1, &skyboxTexture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+
+    /* Prevent pixelating */
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    /* Prevent texture from tiling */
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    for (unsigned int i = 0; i < 6; i++) {
+
+        int w, h, skyColorChannel;
+        if (i == 2) { /* uw_up looks wrong is not flipped */
+            stbi_set_flip_vertically_on_load(true);
+        } else {
+            stbi_set_flip_vertically_on_load(false);
+        }
+        
+        unsigned char* data = stbi_load(facesSkybox[i].c_str(),
+            &w, &h, &skyColorChannel, 0);
+
+        if (data) {
+            glTexImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                data
+            );
+            stbi_image_free(data);
+        }
+
+    }
+
+    stbi_set_flip_vertically_on_load(true);
+
     std::vector<Model3D> modelList;
 
     /* Create object for testing */
@@ -197,7 +303,30 @@ int main(void)
         else {
             viewMatrix = camera.GetViewMatrixFirst();
         }
+
+        /* Render skybox */
+        glDepthMask(GL_FALSE);
+        glDepthFunc(GL_LEQUAL);
+        skyboxShader.useShaderProgram();
+
+        glm::mat4 sky_view = glm::mat4(1.0f);
+        sky_view = glm::mat4(glm::mat3(viewMatrix));
+
+        unsigned int sky_projectionLoc = glGetUniformLocation(skyboxShader.getID() , "projection");
+        glUniformMatrix4fv(sky_projectionLoc, 1, GL_FALSE, glm::value_ptr(projection_matrix));
+
+        unsigned int sky_viewLoc = glGetUniformLocation(skyboxShader.getID(), "view");
+        glUniformMatrix4fv(sky_viewLoc, 1, GL_FALSE, glm::value_ptr(sky_view));
+
+        glBindVertexArray(skyboxVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        glDepthMask(GL_TRUE);
+        glDepthFunc(GL_LEQUAL);
         
+        /* Render models, use the main shader files */
+        mainShader.useShaderProgram();
 
         /* Set uniforms in shaders */
         unsigned int projectionLoc = glGetUniformLocation(mainShader.getID(), "projection");
@@ -270,6 +399,10 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    /* Apply sensitivity value */
+    xoffset *= 0.10f;
+    yoffset *= 0.10f;
 
     lastX = xpos;
     lastY = ypos;
