@@ -79,8 +79,10 @@ int main(void)
     gladLoadGL();
 
     /* Variables for texture initialization */
-    const int textures_count = 2;
-    const char* texture_filenames[textures_count] = { "3D/cat_texture.jpg", "3D/dolphin_texture.jpg"};
+    const int textures_count = 7;
+    const char* texture_filenames[textures_count] = { "3D/cat_texture.jpg", "3D/dolphin_texture.jpg",
+    "3D/shark_texture.jpg", "3D/turtle_texture.jpg", "3D/angelfish_texture.jpg", "3D/coral_texture.jpg", 
+    "3D/diver_texture.jpg" };
 
     int img_width, img_height, color_channels;
 
@@ -117,34 +119,59 @@ int main(void)
 
     /* For mouse events */
     /* TODO: The view can be controlled by using the mouse */
-    glfwSetCursorPosCallback(window, mouse_callback); 
+    glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     /* Initialize shader object */
     Shader mainShader = Shader("Shaders/main.vert", "Shaders/main.frag");
     mainShader.useShaderProgram();
 
+    std::vector<Model3D> modelList;
+
     /* Create object for testing */
     Model3D testObj = Model3D("3D/cat.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 270.0f);
     testObj.rotate_on_axis(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    modelList.push_back(testObj);
 
+    /* https://free3d.com/3d-model/-dolphin-v1--12175.html */
     Model3D dolphinObj = Model3D("3D/dolphin.obj", 0.0f, 5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f);
     dolphinObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-    
-    const int modelCount = 2;
+    modelList.push_back(dolphinObj);
+
+    /* https://free3d.com/3d-model/shark-v2--367955.html */
+    Model3D sharkObj = Model3D("3D/shark.obj", 0.0f, 5.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f);
+    sharkObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    modelList.push_back(sharkObj);
+
+    /* https://free3d.com/3d-model/-sea-turtle-v1--427786.html */
+    Model3D turtleObj = Model3D("3D/turtle.obj", 0.0f, -5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 90.0f);
+    turtleObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    modelList.push_back(turtleObj);
+
+    /* https://free3d.com/3d-model/coral-beauty-angelfish-v1--473554.html */
+    Model3D angelfishObj = Model3D("3D/angelfish.obj", -5.0f, -7.0f, 0.0f, 0.0f, 0.0f, 1.0f, 2.0f, 2.0f, 2.0f, 90.0f);
+    modelList.push_back(angelfishObj);
+
+    /* https://free3d.com/3d-model/coral-v1--901825.html */
+    Model3D coralObj = Model3D("3D/coral.obj", 8.0f, -5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 90.0f);
+    modelList.push_back(coralObj);
+
+    /* https://free3d.com/3d-model/aquarium-deep-sea-diver-v1--436500.html */
+    Model3D diverObj = Model3D("3D/diver.obj", 5.0f, -5.0f, -5.0f, 0.0f, 0.0f, 1.0f, 0.3f, 0.3f, 0.3f, 90.0f);
+    modelList.push_back(diverObj);
+
+    const int modelCount = 7;
     GLuint VAO[modelCount], VBO[modelCount];
 
     /* Setup VAO and VBOs */
     glGenVertexArrays(modelCount, VAO);
     glGenBuffers(modelCount, VBO);
-    
-    /* Draw Cat */
-    glBindVertexArray(VAO[0]);
-    testObj.init_buffers(VAO[0], VBO[0]);
 
-    /* Draw Dolphin */
-    glBindVertexArray(VAO[1]);
-    dolphinObj.init_buffers(VAO[1], VBO[1]);
+    /* Inititalize buffers for each obj in list */
+    for (int i = 0; i < modelCount; i++) {
+        glBindVertexArray(VAO[i]);
+        modelList[i].init_buffers(VAO[i], VBO[i]);
+    }
 
     glm::mat4 projection_matrix = pcam.GetPer();
     
@@ -177,15 +204,18 @@ int main(void)
         GLuint texOAddress = glGetUniformLocation(mainShader.getID(), "tex0");
         glUniform1i(texOAddress, 0);
 
-        /* Draw object with texture */
+        /* Draw submarine object / temporarily still a cat */
         glBindTexture(GL_TEXTURE_2D, textures[0]);
         glActiveTexture(GL_TEXTURE0);
-        testObj.draw(transformationLoc, 0, testObj.fullVertexData.size() / 8, VAO[0]);
+        modelList[0].draw(transformationLoc, 0, testObj.fullVertexData.size() / 8, VAO[0]);
 
-        glBindTexture(GL_TEXTURE_2D, textures[1]);
-        glActiveTexture(GL_TEXTURE0);
-        dolphinObj.draw(transformationLoc, 0, dolphinObj.fullVertexData.size() / 8, VAO[1]);
-
+        /* Draw rest of models in dolphin, shark, turtle, angelfish, coral, diver */
+        for (int i = 1; i < modelList.size(); i++) {
+            glBindTexture(GL_TEXTURE_2D, textures[i]);
+            glActiveTexture(GL_TEXTURE0);
+            modelList[i].draw(transformationLoc, 0, modelList[i].fullVertexData.size() / 8, VAO[i]);
+        }
+  
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
