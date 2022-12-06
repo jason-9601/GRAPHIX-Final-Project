@@ -36,6 +36,7 @@ MyCamera camera(glm::vec3(0.0f, 5.0f, 0.f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 // for determining if perspective cam or ortho cam
 glm::mat4 projection_matrix;
+glm::mat4 skybox_projection_matrix;
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -296,6 +297,7 @@ int main(void)
     }
 
     projection_matrix = pcam.GetPer(60.f);
+    skybox_projection_matrix = pcam.GetPer(60.f);
     
     glm::mat4 viewMatrix;
 
@@ -319,6 +321,7 @@ int main(void)
         else {
             viewMatrix = camera.GetViewMatrixFirst();
             projection_matrix = pcam.GetPer(30.f);
+            skybox_projection_matrix = pcam.GetPer(30.f);
         }
 
         /* Render skybox */
@@ -330,7 +333,7 @@ int main(void)
         sky_view = glm::mat4(glm::mat3(viewMatrix));
 
         unsigned int sky_projectionLoc = glGetUniformLocation(skyboxShader.getID() , "projection");
-        glUniformMatrix4fv(sky_projectionLoc, 1, GL_FALSE, glm::value_ptr(projection_matrix));
+        glUniformMatrix4fv(sky_projectionLoc, 1, GL_FALSE, glm::value_ptr(skybox_projection_matrix));
 
         unsigned int sky_viewLoc = glGetUniformLocation(skyboxShader.getID(), "view");
         glUniformMatrix4fv(sky_viewLoc, 1, GL_FALSE, glm::value_ptr(sky_view));
@@ -447,12 +450,14 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
     {
         projection_matrix = pcam.GetPer(60.f);
+        skybox_projection_matrix = pcam.GetPer(60.f);
         
     }
     // orthographic view
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
     {
         projection_matrix = ocam.GetOrtho();
+        skybox_projection_matrix = pcam.GetPer(60.f);
         const float nice = 90.f;
         camera.Pitch = nice;
         
