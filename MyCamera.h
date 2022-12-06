@@ -62,7 +62,7 @@ class MyCamera {
     glm::mat4 GetViewMatrixFirst()
     {
 
-        return glm::lookAt(Position, Position + Front, Up);
+        return glm::lookAt(Position, Position + (Front * glm::vec3(-1.f, -1.f, -1.f)), Up);
     }
 
     // processes mouse movement from main cpp
@@ -112,12 +112,13 @@ class OrthoCamera : public MyCamera {
 class PerspectiveCamera : public MyCamera {
     public:
         /* Perspective view function */
-        glm::mat4 GetPer() {
+        glm::mat4 GetPer(float rad) {
             return glm::perspective(
-                glm::radians(60.0f), // FOV
+                glm::radians(rad), // FOV
                 750.f / 750.f, // Aspect Ratio
                 0.1f, // Near
                 100.0f // Far
             );
         }
 };
+

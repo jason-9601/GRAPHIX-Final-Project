@@ -32,7 +32,7 @@ float lastX = 300, lastY = 300; // last mouse position (initalized to be in cent
 // camera
 PerspectiveCamera pcam;
 OrthoCamera ocam;
-MyCamera camera(glm::vec3(0.0f, 0.0f, 10.f), glm::vec3(0.0f, 1.0f, 0.0f));
+MyCamera camera(glm::vec3(0.0f, 5.0f, 0.f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 // for determining if perspective cam or ortho cam
 glm::mat4 projection_matrix;
@@ -295,7 +295,7 @@ int main(void)
         modelList[i].init_buffers(VAO[i], VBO[i]);
     }
 
-    projection_matrix = pcam.GetPer();
+    projection_matrix = pcam.GetPer(60.f);
     
     glm::mat4 viewMatrix;
 
@@ -318,6 +318,7 @@ int main(void)
         }
         else {
             viewMatrix = camera.GetViewMatrixFirst();
+            projection_matrix = pcam.GetPer(30.f);
         }
 
         /* Render skybox */
@@ -445,7 +446,7 @@ void processInput(GLFWwindow* window)
     // perspective view
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
     {
-        projection_matrix = pcam.GetPer();
+        projection_matrix = pcam.GetPer(60.f);
         
     }
     // orthographic view
