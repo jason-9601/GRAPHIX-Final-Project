@@ -103,8 +103,8 @@ class OrthoCamera : public MyCamera {
     public:
         /* Orthographic view function */
         glm::mat4 GetOrtho() {
-            return glm::ortho(-5.f, 5.f,
-                -5.f, 5.f,
+            return glm::ortho(-15.f, 15.f,
+                -15.f, 15.f,
                 -1000.f, 1000.f);
         }
 };

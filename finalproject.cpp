@@ -295,7 +295,7 @@ int main(void)
         modelList[i].init_buffers(VAO[i], VBO[i]);
     }
 
-    glm::mat4 projection_matrix = pcam.GetPer();
+    projection_matrix = pcam.GetPer();
     
     glm::mat4 viewMatrix;
 
