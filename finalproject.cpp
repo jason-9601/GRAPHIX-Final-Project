@@ -315,8 +315,11 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* Get projection and view matrix from perspective camera */
-        if (isPers || isOrtho) {
+        if (isPers) {
             viewMatrix = camera.GetViewMatrixThird();
+        }
+        else if (isOrtho) {
+            viewMatrix = camera.GetViewMatrixFirst();
         }
         else {
             viewMatrix = camera.GetViewMatrixFirst();
@@ -458,9 +461,28 @@ void processInput(GLFWwindow* window)
     {
         projection_matrix = ocam.GetOrtho();
         skybox_projection_matrix = pcam.GetPer(60.f);
-        const float nice = 90.f;
-        camera.Pitch = nice;
+        camera.Pitch = 89.f;
+        camera.Yaw = -89.f;
         
+    }
+
+    if (isOrtho) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            camera.Position.z += .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            camera.Position.x += .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            camera.Position.z -= .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            camera.Position.x -= .005f;
+        }
+    }
+    else if (isOrtho == false) {
+        camera.Position.x = 0.f;
+        camera.Position.z = 0.f;
     }
 
 }

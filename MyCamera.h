@@ -61,7 +61,7 @@ class MyCamera {
 
     glm::mat4 GetViewMatrixFirst()
     {
-
+        updateCameraVectors();
         return glm::lookAt(Position, Position + (Front * glm::vec3(-1.f, -1.f, -1.f)), Up);
     }
 
