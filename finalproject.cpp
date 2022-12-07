@@ -57,6 +57,7 @@ bool low = true;
 bool med = false;
 bool high = false;
 
+bool isFirstPerson = false;
 
 void Key_Callback(GLFWwindow* window,
     int key,
@@ -285,7 +286,7 @@ int main(void)
     modelList.push_back(dolphinObj);
 
     /* https://free3d.com/3d-model/shark-v2--367955.html */
-    Model3D sharkObj = Model3D("3D/shark.obj", 0.0f, 5.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f);
+    Model3D sharkObj = Model3D("3D/shark.obj", 0.0f, 5.0f, 20.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f);
     sharkObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(sharkObj);
 
@@ -340,14 +341,17 @@ int main(void)
         /* Get projection and view matrix from perspective camera */
         if (isPers) {
             viewMatrix = camera.GetViewMatrixThird();
+            isFirstPerson = false;
         }
         else if (isOrtho) {
             viewMatrix = camera.GetViewMatrixFirst();
+            isFirstPerson = false;
         }
         else {
             viewMatrix = camera.GetViewMatrixFirst();
             projection_matrix = pcam.GetPer(30.f);
             skybox_projection_matrix = pcam.GetPer(30.f);
+            isFirstPerson = true;
         }
 
         /* Render skybox */
@@ -363,6 +367,9 @@ int main(void)
 
         unsigned int sky_viewLoc = glGetUniformLocation(skyboxShader.getID(), "view");
         glUniformMatrix4fv(sky_viewLoc, 1, GL_FALSE, glm::value_ptr(sky_view));
+
+        unsigned int firstPersonSkyboxLoc = glGetUniformLocation(skyboxShader.getID(), "firstPerson");
+        glUniform1f(firstPersonSkyboxLoc, isFirstPerson);
 
         glBindVertexArray(skyboxVAO);
         glActiveTexture(GL_TEXTURE0);
@@ -444,6 +451,9 @@ int main(void)
 
         GLuint texOAddress = glGetUniformLocation(mainShader.getID(), "tex0");
         glUniform1i(texOAddress, 0);
+
+        unsigned int firstPersonLoc = glGetUniformLocation(mainShader.getID(), "firstPerson");
+        glUniform1f(firstPersonLoc, isFirstPerson);
 
         /* Draw submarine object / temporarily still a cat */
         glBindTexture(GL_TEXTURE_2D, textures[0]);
