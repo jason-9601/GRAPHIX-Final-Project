@@ -53,6 +53,10 @@ DirectionalLight dlight(glm::vec3(4.f, 11.f, -3.f));
 float plight_str = .05f;
 float dlight_str = .3f;
 
+bool low = true;
+bool med = false;
+bool high = false;
+
 
 void Key_Callback(GLFWwindow* window,
     int key,
@@ -71,6 +75,25 @@ void Key_Callback(GLFWwindow* window,
     {
         isOrtho = true;
         isPers = false;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+    {
+        if (low) {
+            low = false;
+            med = true;
+            plight_str = .5f;
+        }
+        else if (med) {
+            med = false;
+            high = true;
+            plight_str = 1.f;
+        }
+        else if (high) {
+            high = false;
+            low = true;
+            plight_str = .05f;
+        }
     }
 }
 
@@ -485,6 +508,7 @@ void processInput(GLFWwindow* window)
         camera.Position.z = 0.f;
     }
 
+    
 }
 
 // for mouse movement
