@@ -34,6 +34,8 @@ uniform vec3 ourColor;
 uniform sampler2D tex0;
 uniform sampler2D norm_tex;
 
+uniform bool firstPerson;
+
 vec3 CalcDirLight(vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(vec3 normal, vec3 fragPos, vec3 viewDir);
 
@@ -49,6 +51,11 @@ void main()
     result += CalcPointLight(normal, fragPos, viewDir);
 	
     FragColor = vec4(result, 1.0f) * (texture(tex0, texCoord));
+
+    if (firstPerson){
+        FragColor.r = 0.0f;
+        FragColor.b = 0.0f;
+    }
 }
 
 vec3 CalcDirLight(vec3 normal, vec3 viewDir)

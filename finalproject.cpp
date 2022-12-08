@@ -486,6 +486,9 @@ int main(void)
         GLuint texOAddress = glGetUniformLocation(mainShader.getID(), "tex0");
         glUniform1i(texOAddress, 0);
 
+        unsigned int firstPersonLoc = glGetUniformLocation(mainShader.getID(), "firstPerson");
+        glUniform1f(firstPersonLoc, isFirstPerson);
+
         /* Set uniforms in normal shader which will be used for rendering the ship */
         normalShader.useShaderProgram();
         /* Point light for normal shader*/
@@ -525,6 +528,8 @@ int main(void)
         unsigned int normDirspecPhogLoc = glGetUniformLocation(normalShader.getID(), "dirspecPhong");
         glUniform1f(normDirspecPhogLoc, dlight.specPhong);
         /* Rest of uniforms for normal shader */
+        unsigned int normFirstPersonLoc = glGetUniformLocation(mainShader.getID(), "firstPerson");
+        glUniform1f(normFirstPersonLoc, isFirstPerson);
         unsigned int normProjectionLoc = glGetUniformLocation(normalShader.getID(), "projection");
         glUniformMatrix4fv(normProjectionLoc, 1, GL_FALSE, glm::value_ptr(projection_matrix));
         unsigned int normViewLoc = glGetUniformLocation(normalShader.getID(), "view");
@@ -534,9 +539,6 @@ int main(void)
         glUniform1i(normTexOAddress, 0);
         GLuint normTex2Address = glGetUniformLocation(normalShader.getID(), "norm_tex");
         glUniform1i(normTex2Address, 1);
-
-        unsigned int firstPersonLoc = glGetUniformLocation(mainShader.getID(), "firstPerson");
-        glUniform1f(firstPersonLoc, isFirstPerson);
 
         /* Draw submarine object */
         glActiveTexture(GL_TEXTURE0);
