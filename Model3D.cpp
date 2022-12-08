@@ -214,7 +214,9 @@ void Model3D::rotate(float rotateAngle, glm::vec3 rotateAxis) {
 }
 
 void Model3D::move(glm::vec3 movePos) {
-    this->transformation_matrix = glm::translate(this->transformation_matrix, movePos);
+
+
+        this->transformation_matrix = glm::translate(this->transformation_matrix, movePos);
 }
 
 void Model3D::scale(glm::vec3 scaleModel) {
@@ -222,10 +224,8 @@ void Model3D::scale(glm::vec3 scaleModel) {
 }
 
 void Model3D::printDepth() {
-    if (this->transformation_matrix[3][1] == this->transformation_matrix[3][3]) {
-        
-    }
-    std::cout << this->transformation_matrix[3][1] << std::endl;
+   
+    std::cout << "Depth of Main Object is " << this->transformation_matrix[3][1] << ".\r";
 }
 
 /* Initialize buffers for obj with position, normals, and texture */

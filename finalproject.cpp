@@ -301,7 +301,7 @@ int main(void)
     stbi_set_flip_vertically_on_load(true);
 
     /* Create main object, will be normal mapped. Set last parameter to true as it is normal mapped */
-    Model3D mainObj = Model3D("3D/shark.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.03f, 0.03f, 0.03f, 270.0f, true);
+    Model3D mainObj = Model3D("3D/shark.obj", 0.0f, -0.05f, 0.0f, 0.0f, 0.0f, 1.0f, 0.03f, 0.03f, 0.03f, 270.0f, true);
     mainObj.rotate_on_axis(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 
     /* Create object for testing */
@@ -621,13 +621,16 @@ void processInput(GLFWwindow* window)
             //x_mod += .005f;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) // ascend
-        {
-            modelList[0].move(glm::vec3(0.0f, 0.0f, -0.05f));
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) // descend
+        {   
+                modelList[0].move(glm::vec3(0.0f, 0.0f, -0.05f));
             //y_mod += .005f;
         }
-        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) // descend
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) // ascend
         {
+            if (modelList[0].transformation_matrix[3][1] >= 0.00f){
+                modelList[0].move(glm::vec3(0.0f, 0.0f, -0.05f));
+            }
             modelList[0].move(glm::vec3(0.0f, 0.0f, 0.05f));
             //y_mod -= .005f;
         }
