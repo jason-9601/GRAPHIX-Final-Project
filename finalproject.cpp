@@ -52,7 +52,7 @@ float theta = 0.0f;
 
 // lights (pointlight and directional)
 PointLight plight(glm::vec3(0, 0, 5));
-DirectionalLight dlight(glm::vec3(4.f, 11.f, -3.f));
+DirectionalLight dlight(glm::vec3(0.f, 10.f, 0.f));
 
 // point light & directional light intensity
 float plight_str = .05f;
@@ -387,6 +387,11 @@ int main(void)
             skybox_projection_matrix = pcam.GetPer(30.f);
             isFirstPerson = true;
         }
+
+        // light to always follow sub
+        plight.lightPos.x = modelList[0].transformation_matrix[3][0];
+        plight.lightPos.y = modelList[0].transformation_matrix[3][1];
+        plight.lightPos.z = modelList[0].transformation_matrix[3][2] - 2.f;
 
         /* Render skybox */
         glDepthMask(GL_FALSE);
