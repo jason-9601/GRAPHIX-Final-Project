@@ -547,8 +547,10 @@ int main(void)
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, norm_tex); 
 
-        modelList[0].draw(normTransformationLoc, 0, mainObj.fullVertexData.size() / 14, VAO[0]);
-        modelList[0].printDepth();
+        if (isPers or isOrtho) {
+            modelList[0].draw(normTransformationLoc, 0, mainObj.fullVertexData.size() / 14, VAO[0]);
+            modelList[0].printDepth();
+        }
 
         /* Unbind textures */
         glActiveTexture(GL_TEXTURE0);
@@ -648,8 +650,9 @@ void processInput(GLFWwindow* window)
         }
     }
     else if (isOrtho == false) {
-        camera.Position.x = 0.f;
-        camera.Position.z = 0.f;
+        camera.Position.x = modelList[0].transformation_matrix[3][0];
+        camera.Position.y = modelList[0].transformation_matrix[3][1];
+        camera.Position.z = modelList[0].transformation_matrix[3][2];
     }
 
 }
