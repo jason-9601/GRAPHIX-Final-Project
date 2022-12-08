@@ -56,7 +56,7 @@ class MyCamera {
         float camY = sin(glm::radians(Pitch)) * radius;
         float camZ = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch)) * radius;
 
-        return glm::lookAt(glm::vec3(camX, camY, camZ), Front, Up);
+        return glm::lookAt(Position + glm::vec3(camX, camY, camZ), Position + Front, Up);
     }
 
     glm::mat4 GetViewMatrixFirst()
