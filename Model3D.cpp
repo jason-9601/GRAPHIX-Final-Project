@@ -5,7 +5,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <vector>
+
+#include <string>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "Model3D.h"
 
@@ -90,6 +95,32 @@ void Model3D::rotate_on_axis(float rotateAngle, glm::vec3 rotateAxis) {
     this->transformation_matrix = glm::rotate(this->transformation_matrix,
         rotateAngle,
         rotateAxis);
+}
+
+void Model3D::transMatrix() {
+    this->transformation_matrix = glm::mat4(1.0f);
+}
+
+
+void Model3D::rotate(float rotateAngle, glm::vec3 rotateAxis) {
+    this->transformation_matrix = glm::rotate(this->transformation_matrix, 
+        rotateAngle,
+        rotateAxis);
+}
+
+void Model3D::move(glm::vec3 movePos) {
+    this->transformation_matrix = glm::translate(this->transformation_matrix, movePos);
+}
+
+void Model3D::scale(glm::vec3 scaleModel) {
+    this->transformation_matrix = glm::translate(this->transformation_matrix, scaleModel);
+}
+
+void Model3D::printDepth() {
+    if (this->transformation_matrix[3][1] == this->transformation_matrix[3][3]) {
+        
+    }
+    std::cout << this->transformation_matrix[3][1] << std::endl;
 }
 
 /* Initialize buffers for obj with position, normals, and texture */

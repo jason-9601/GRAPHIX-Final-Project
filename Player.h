@@ -13,4 +13,4 @@
 // (note: sub cannot go above 0 in Y Axis): start position y-axis negative 
 // -- check other classes to ensure no overlap ++ make either (1) condition that if y-axis reach 0 not move OR (2) make world/cam extend only up to y-axis 0 ??? 2x check this
 
-// PRINT CURRENT COORD -- Search for similar concept i found on youtube before regarding
+// PRINT CURRENT COORD -- Search for similar concept i found on youtube before regardin

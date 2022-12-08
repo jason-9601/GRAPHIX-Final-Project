@@ -45,6 +45,11 @@ float lastFrame = 0.0f; // time of last frame
 bool isPers = true;
 bool isOrtho = false;
 
+// mainObj initialization, rot, scale, and pos
+float x_mod, z_mod = 0.0f;
+float y_mod = 0.005;
+float theta = 0.0f;
+
 // lights (pointlight and directional)
 PointLight plight(glm::vec3(0, 0, 5));
 DirectionalLight dlight(glm::vec3(4.f, 11.f, -3.f));
@@ -275,8 +280,9 @@ int main(void)
     std::vector<Model3D> modelList;
 
     /* Create object for testing */
-    Model3D testObj = Model3D("3D/cat.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 270.0f);
-    testObj.rotate_on_axis(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    Model3D testObj = Model3D("3D/cat.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.01f, 0.01f, 0.01f, 270.0f);
+    testObj.rotate_on_axis(90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+// HERE???????????
     modelList.push_back(testObj);
 
     /* https://free3d.com/3d-model/-dolphin-v1--12175.html */
@@ -448,7 +454,19 @@ int main(void)
         /* Draw submarine object / temporarily still a cat */
         glBindTexture(GL_TEXTURE_2D, textures[0]);
         glActiveTexture(GL_TEXTURE0);
+        // HERE
+        
+        modelList[0].transMatrix();
+        modelList[0].rotate(x_mod, glm::vec3(1.0f, 0.0f, 0.0f));
+        modelList[0].rotate(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+        modelList[0].rotate(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+        modelList[0].move(glm::vec3(0.0f, y_mod, z_mod));
+        modelList[0].scale(glm::vec3(0.01f, 0.01f, 0.01f)); // gets values for scale
+        // END OF HERE
         modelList[0].draw(transformationLoc, 0, testObj.fullVertexData.size() / 8, VAO[0]);
+
+        modelList[0].printDepth();
+
 
         /* Draw rest of models in dolphin, shark, turtle, angelfish, coral, diver */
         for (int i = 1; i < modelList.size(); i++) {
@@ -487,6 +505,39 @@ void processInput(GLFWwindow* window)
         camera.Pitch = 89.f;
         camera.Yaw = -89.f;
         
+    }
+
+    if (isPers) {
+        // MOVE PLAYER IN Z-AXIS
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
+        {
+            z_mod += .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // backward
+        {
+            z_mod -= .005f;
+        }
+
+        // TURN PLAYER IN X-AXIS
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // turn left
+        {
+            x_mod -= .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // turn right
+        {
+            x_mod += .005f;
+        }
+
+        // MOVE PLAYER UP OR DOWN
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) // ascend
+        {
+            y_mod += .005f;
+
+        }
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) // descend
+        {
+            y_mod -= .005f;
+        }
     }
 
     if (isOrtho) {
