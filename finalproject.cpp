@@ -58,6 +58,9 @@ DirectionalLight dlight(glm::vec3(0.f, 10.f, 0.f));
 float plight_str = .05f;
 float dlight_str = .3f;
 
+// For adjusting how fast the submarine object goes 
+float submarine_speed = 1.0f;
+
 bool low = true;
 bool med = false;
 bool high = false;
@@ -104,6 +107,8 @@ void Key_Callback(GLFWwindow* window,
             plight_str = .05f;
         }
     }
+
+    modelList[0].printDepth();
 }
 
 int main(void)
@@ -301,7 +306,7 @@ int main(void)
     stbi_set_flip_vertically_on_load(true);
 
     /* Create main object, will be normal mapped. Set last parameter to true as it is normal mapped */
-    Model3D mainObj = Model3D("3D/shark.obj", 0.0f, -0.05f, 0.0f, 0.0f, 0.0f, 1.0f, 0.03f, 0.03f, 0.03f, 270.0f, true);
+    Model3D mainObj = Model3D("3D/shark.obj", 0.0f, -10.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.03f, 0.03f, 0.03f, 270.0f, true);
     mainObj.rotate_on_axis(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 
     /* Create object for testing */
@@ -310,31 +315,36 @@ int main(void)
 
     modelList.push_back(mainObj);
 
+
+    /* MODELS AT DEPTH -20.0 */
+
     /* https://free3d.com/3d-model/-dolphin-v1--12175.html */
-    Model3D dolphinObj = Model3D("3D/dolphin.obj", 0.0f, 5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f, false);
+    Model3D dolphinObj = Model3D("3D/dolphin.obj", 20.0f, -20.0f, 20.0f, 0.0f, 0.0f, 1.0f, 0.025f, 0.025f, 0.025f, 90.0f, false);
     dolphinObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(dolphinObj);
 
     /* https://free3d.com/3d-model/shark-v2--367955.html */
-    Model3D sharkObj = Model3D("3D/shark.obj", 0.0f, 5.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f, false);
+    Model3D sharkObj = Model3D("3D/shark.obj", -20.0f, -20.0f, 20.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f, false);
     sharkObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(sharkObj);
 
     /* https://free3d.com/3d-model/-sea-turtle-v1--427786.html */
-    Model3D turtleObj = Model3D("3D/turtle.obj", 0.0f, -5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 90.0f, false);
+    Model3D turtleObj = Model3D("3D/turtle.obj", -10.0f, -20.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.04f, 0.04f, 0.04f, 90.0f, false);
     turtleObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(turtleObj);
 
+    /* MODELS AT DEPTH -30.0 */
+
     /* https://free3d.com/3d-model/coral-beauty-angelfish-v1--473554.html */
-    Model3D angelfishObj = Model3D("3D/angelfish.obj", -5.0f, -7.0f, 0.0f, 0.0f, 0.0f, 1.0f, 2.0f, 2.0f, 2.0f, 90.0f, false);
+    Model3D angelfishObj = Model3D("3D/angelfish.obj", 0.0f, -30.0f, 10.0f, 0.0f, 0.0f, 1.0f, 2.0f, 2.0f, 2.0f, 90.0f, false);
     modelList.push_back(angelfishObj);
 
     /* https://free3d.com/3d-model/coral-v1--901825.html */
-    Model3D coralObj = Model3D("3D/coral.obj", 8.0f, -5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 90.0f, false);
+    Model3D coralObj = Model3D("3D/coral.obj", -10.0f, -30.0f, 20.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 90.0f, false);
     modelList.push_back(coralObj);
 
     /* https://free3d.com/3d-model/aquarium-deep-sea-diver-v1--436500.html */
-    Model3D diverObj = Model3D("3D/diver.obj", 5.0f, -5.0f, -5.0f, 0.0f, 0.0f, 1.0f, 0.3f, 0.3f, 0.3f, 90.0f, false);
+    Model3D diverObj = Model3D("3D/diver.obj", 20.0f, -30.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.3f, 0.3f, 0.3f, 90.0f, false);
     modelList.push_back(diverObj);
 
     const int modelCount = 7;
@@ -554,7 +564,7 @@ int main(void)
 
         if (isPers or isOrtho) {
             modelList[0].draw(normTransformationLoc, 0, mainObj.fullVertexData.size() / 14, VAO[0]);
-            modelList[0].printDepth();
+            //modelList[0].printDepth();
         }
 
         /* Unbind textures */
@@ -608,11 +618,11 @@ void processInput(GLFWwindow* window)
     if (isPers) {
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
         {
-            modelList[0].move(glm::vec3(-0.05f, 0.0f, 0.0f));
+            modelList[0].move(glm::vec3(-1.0f * submarine_speed, 0.0f, 0.0f), modelList);
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // backward
         {
-            modelList[0].move(glm::vec3(0.05f, 0.0f, 0.0f));
+            modelList[0].move(glm::vec3(submarine_speed, 0.0f, 0.0f), modelList);
         }
 
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // turn left
@@ -626,11 +636,11 @@ void processInput(GLFWwindow* window)
 
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) // descend
         {   
-            modelList[0].move(glm::vec3(0.0f, 0.0f, -0.05f));
+            modelList[0].move(glm::vec3(0.0f, 0.0f, -1.0f * submarine_speed), modelList);
         }
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) // ascend
         {
-            modelList[0].move(glm::vec3(0.0f, 0.0f, 0.05f));
+            modelList[0].move(glm::vec3(0.0f, 0.0f, submarine_speed), modelList);
         }
     }
 

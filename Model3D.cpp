@@ -137,18 +137,18 @@ void Model3D::init_data_with_normal_maps() {
         glm::vec2 deltaUV1 = uv2 - uv1;
         glm::vec2 deltaUV2 = uv3 - uv1;
 
-        float r = 1.0f / ((deltaUV1.x * deltaUV2.y) - (deltaUV1.y * deltaUV2.x));
+float r = 1.0f / ((deltaUV1.x * deltaUV2.y) - (deltaUV1.y * deltaUV2.x));
 
-        glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
-        glm::vec3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
+glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
+glm::vec3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
 
-        tangents.push_back(tangent);
-        tangents.push_back(tangent);
-        tangents.push_back(tangent);
+tangents.push_back(tangent);
+tangents.push_back(tangent);
+tangents.push_back(tangent);
 
-        bitangents.push_back(bitangent);
-        bitangents.push_back(bitangent);
-        bitangents.push_back(bitangent);
+bitangents.push_back(bitangent);
+bitangents.push_back(bitangent);
+bitangents.push_back(bitangent);
 
     }
 
@@ -208,7 +208,7 @@ void Model3D::transMatrix() {
 
 
 void Model3D::rotate(float rotateAngle, glm::vec3 rotateAxis) {
-    this->transformation_matrix = glm::rotate(this->transformation_matrix, 
+    this->transformation_matrix = glm::rotate(this->transformation_matrix,
         rotateAngle,
         rotateAxis);
 }
@@ -226,13 +226,53 @@ void Model3D::move(glm::vec3 movePos) {
 
 }
 
+/* Function for moving with collision checking */
+void Model3D::move(glm::vec3 movePos, std::vector<Model3D> modelList) {
+
+    glm::mat4 matrix_after_move = glm::translate(this->transformation_matrix, movePos);
+
+    // If after applying the move, the object goes above 0 in y-axis, do not move //
+    if (matrix_after_move[3][1] >= 0.0f) {
+        return;
+    }
+
+    for (int i = 1; i < modelList.size(); i++) {
+        if (checkCollision(matrix_after_move, modelList[i].transformation_matrix) == true) {
+            std::cout << "has collided with model: " << i << "\n";
+            return;
+        }
+    }
+   
+    this->transformation_matrix = glm::translate(this->transformation_matrix, movePos);
+}
+
 void Model3D::scale(glm::vec3 scaleModel) {
     this->transformation_matrix = glm::translate(this->transformation_matrix, scaleModel);
 }
 
 void Model3D::printDepth() {
    
-    std::cout << "Depth of Main Object is " << this->transformation_matrix[3][1] << ".\r";
+    //std::cout << "Depth of Main Object is " << this->transformation_matrix[3][1] << ".\r";
+    std::cout << "Depth of Main Object is " << this->transformation_matrix[3][1] << "\n"; // for testing //
+}
+
+bool Model3D::checkCollision(glm::mat4 myPosition, glm::mat4 possibleCollisionPosition) {
+
+    float offset = 4.0f;
+
+    bool x_axis_collision = myPosition[3][0] + offset >= possibleCollisionPosition[3][0] && 
+                      possibleCollisionPosition[3][0] + offset >= myPosition[3][0];
+
+    bool y_axis_collision = myPosition[3][1] + offset >= possibleCollisionPosition[3][1] &&
+                      possibleCollisionPosition[3][1] + offset >= myPosition[3][1];
+
+    bool has_collided = x_axis_collision && y_axis_collision;
+
+    if (has_collided) {
+        std::cout << "COLISSION OCCURED";
+    }
+
+    return has_collided;
 }
 
 /* Initialize buffers for obj with position, normals, and texture */

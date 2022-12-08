@@ -46,9 +46,13 @@ public:
 
     void move(glm::vec3 movePos);
 
+    void move(glm::vec3 movePos, std::vector<Model3D> modelList);
+
     void scale(glm::vec3 scaleModel);
 
     void printDepth();
+
+    bool checkCollision(glm::mat4 myPosition, glm::mat4 possibleCollisionPosition);
 
     void init_buffers(unsigned int VAO, unsigned int VBO);
 
