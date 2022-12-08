@@ -5,6 +5,8 @@ in vec2 texCoord;
 in vec3 normCoord;
 in vec3 fragPos;
 
+uniform bool firstPerson;
+
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform float constant; // light constant
@@ -44,6 +46,11 @@ void main()
     result += CalcPointLight(normal, fragPos, viewDir);
 	
 	FragColor = vec4(result, 1.0f) * texture(tex0, texCoord);
+
+    if (firstPerson){
+        FragColor.r = 0.0f;
+        FragColor.b = 0.0f;
+    }
 }
 
 vec3 CalcDirLight(vec3 normal, vec3 viewDir)

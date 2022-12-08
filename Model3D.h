@@ -9,6 +9,11 @@
 
 #include <vector>
 
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 class Model3D {
 
 public:
@@ -34,6 +39,16 @@ public:
     void init_transformation_matrix();
 
     void rotate_on_axis(float rotateAngle, glm::vec3 rotateAxis);
+
+    void transMatrix();
+
+    void rotate(float rotateAngle, glm::vec3 rotateAxis);
+
+    void move(glm::vec3 movePos);
+
+    void scale(glm::vec3 scaleModel);
+
+    void printDepth();
 
     void init_buffers(unsigned int VAO, unsigned int VBO);
 

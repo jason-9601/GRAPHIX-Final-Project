@@ -45,6 +45,11 @@ float lastFrame = 0.0f; // time of last frame
 bool isPers = true;
 bool isOrtho = false;
 
+// mainObj initialization, rot, scale, and pos
+float x_mod, z_mod = 0.0f;
+float y_mod = 0.005;
+float theta = 0.0f;
+
 // lights (pointlight and directional)
 PointLight plight(glm::vec3(0, 0, 5));
 DirectionalLight dlight(glm::vec3(4.f, 11.f, -3.f));
@@ -53,6 +58,14 @@ DirectionalLight dlight(glm::vec3(4.f, 11.f, -3.f));
 float plight_str = .05f;
 float dlight_str = .3f;
 
+bool low = true;
+bool med = false;
+bool high = false;
+
+bool isFirstPerson = false;
+
+/* Contains all model data */
+std::vector<Model3D> modelList;
 
 void Key_Callback(GLFWwindow* window,
     int key,
@@ -71,6 +84,25 @@ void Key_Callback(GLFWwindow* window,
     {
         isOrtho = true;
         isPers = false;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+    {
+        if (low) {
+            low = false;
+            med = true;
+            plight_str = .5f;
+        }
+        else if (med) {
+            med = false;
+            high = true;
+            plight_str = 1.f;
+        }
+        else if (high) {
+            high = false;
+            low = true;
+            plight_str = .05f;
+        }
     }
 }
 
@@ -268,12 +300,15 @@ int main(void)
 
     stbi_set_flip_vertically_on_load(true);
 
-    std::vector<Model3D> modelList;
-
     /* Create main object, will be normal mapped. Set last parameter to true as it is normal mapped */
-    Model3D testObj = Model3D("3D/shark.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.04f, 0.04f, 0.04f, 270.0f, true);
-    testObj.rotate_on_axis(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-    modelList.push_back(testObj);
+    Model3D mainObj = Model3D("3D/shark.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.03f, 0.03f, 0.03f, 270.0f, true);
+    mainObj.rotate_on_axis(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+
+    /* Create object for testing */
+    //Model3D testObj = Model3D("3D/cat.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.01f, 0.01f, 0.01f, 270.0f, true);
+    //testObj.rotate_on_axis(90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+
+    modelList.push_back(mainObj);
 
     /* https://free3d.com/3d-model/-dolphin-v1--12175.html */
     Model3D dolphinObj = Model3D("3D/dolphin.obj", 0.0f, 5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f, false);
@@ -338,13 +373,19 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* Get projection and view matrix from perspective camera */
-        if (isPers || isOrtho) {
+        if (isPers) {
             viewMatrix = camera.GetViewMatrixThird();
+            isFirstPerson = false;
+        }
+        else if (isOrtho) {
+            viewMatrix = camera.GetViewMatrixFirst();
+            isFirstPerson = false;
         }
         else {
             viewMatrix = camera.GetViewMatrixFirst();
             projection_matrix = pcam.GetPer(30.f);
             skybox_projection_matrix = pcam.GetPer(30.f);
+            isFirstPerson = true;
         }
 
         /* Render skybox */
@@ -360,6 +401,9 @@ int main(void)
 
         unsigned int sky_viewLoc = glGetUniformLocation(skyboxShader.getID(), "view");
         glUniformMatrix4fv(sky_viewLoc, 1, GL_FALSE, glm::value_ptr(sky_view));
+
+        unsigned int firstPersonSkyboxLoc = glGetUniformLocation(skyboxShader.getID(), "firstPerson");
+        glUniform1f(firstPersonSkyboxLoc, isFirstPerson);
 
         glBindVertexArray(skyboxVAO);
         glActiveTexture(GL_TEXTURE0);
@@ -491,6 +535,9 @@ int main(void)
         GLuint normTex2Address = glGetUniformLocation(normalShader.getID(), "norm_tex");
         glUniform1i(normTex2Address, 1);
 
+        unsigned int firstPersonLoc = glGetUniformLocation(mainShader.getID(), "firstPerson");
+        glUniform1f(firstPersonLoc, isFirstPerson);
+
         /* Draw submarine object */
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textures[0]);
@@ -498,7 +545,8 @@ int main(void)
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, norm_tex); 
 
-        modelList[0].draw(normTransformationLoc, 0, testObj.fullVertexData.size() / 8, VAO[0]);
+        modelList[0].draw(normTransformationLoc, 0, mainObj.fullVertexData.size() / 14, VAO[0]);
+        modelList[0].printDepth();
 
         /* Unbind textures */
         glActiveTexture(GL_TEXTURE0);
@@ -543,9 +591,63 @@ void processInput(GLFWwindow* window)
     {
         projection_matrix = ocam.GetOrtho();
         skybox_projection_matrix = pcam.GetPer(60.f);
-        const float nice = 90.f;
-        camera.Pitch = nice;
+        camera.Pitch = 89.f;
+        camera.Yaw = -89.f;
         
+    }
+
+    if (isPers) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
+        {
+            modelList[0].move(glm::vec3(-0.05f, 0.0f, 0.0f));
+            //z_mod += .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // backward
+        {
+            modelList[0].move(glm::vec3(0.05f, 0.0f, 0.0f));
+            //z_mod -= .005f;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // turn left
+        {
+            modelList[0].move(glm::vec3(0.0f, -0.05f, 0.0f));
+            //x_mod -= .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // turn right
+        {
+            modelList[0].move(glm::vec3(0.0f, 0.05f, 0.0f));
+            //x_mod += .005f;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) // ascend
+        {
+            modelList[0].move(glm::vec3(0.0f, 0.0f, -0.05f));
+            //y_mod += .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) // descend
+        {
+            modelList[0].move(glm::vec3(0.0f, 0.0f, 0.05f));
+            //y_mod -= .005f;
+        }
+    }
+
+    if (isOrtho) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            camera.Position.z += .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            camera.Position.x += .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            camera.Position.z -= .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            camera.Position.x -= .005f;
+        }
+    }
+    else if (isOrtho == false) {
+        camera.Position.x = 0.f;
+        camera.Position.z = 0.f;
     }
 
 }
