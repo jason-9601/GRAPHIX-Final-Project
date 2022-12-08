@@ -215,8 +215,15 @@ void Model3D::rotate(float rotateAngle, glm::vec3 rotateAxis) {
 
 void Model3D::move(glm::vec3 movePos) {
 
+    glm::mat4 matrix_after_move = glm::translate(this->transformation_matrix, movePos);
 
+    // If after applying the move, the object goes above 0 in y-axis, do not move //
+    if (matrix_after_move[3][1] >= 0.0f) {
+
+    } else {
         this->transformation_matrix = glm::translate(this->transformation_matrix, movePos);
+    }
+
 }
 
 void Model3D::scale(glm::vec3 scaleModel) {

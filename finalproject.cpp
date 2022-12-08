@@ -609,37 +609,28 @@ void processInput(GLFWwindow* window)
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
         {
             modelList[0].move(glm::vec3(-0.05f, 0.0f, 0.0f));
-            //z_mod += .005f;
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // backward
         {
             modelList[0].move(glm::vec3(0.05f, 0.0f, 0.0f));
-            //z_mod -= .005f;
         }
 
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // turn left
         {
-            modelList[0].move(glm::vec3(0.0f, -0.05f, 0.0f));
-            //x_mod -= .005f;
+            modelList[0].rotate_on_axis(0.007f, glm::vec3(0.0f, 0.0f, 1.0f));
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // turn right
         {
-            modelList[0].move(glm::vec3(0.0f, 0.05f, 0.0f));
-            //x_mod += .005f;
+            modelList[0].rotate_on_axis(-0.007f, glm::vec3(0.0f, 0.0f, 1.0f));
         }
 
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) // descend
         {   
-                modelList[0].move(glm::vec3(0.0f, 0.0f, -0.05f));
-            //y_mod += .005f;
+            modelList[0].move(glm::vec3(0.0f, 0.0f, -0.05f));
         }
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) // ascend
         {
-            if (modelList[0].transformation_matrix[3][1] >= 0.00f){
-                modelList[0].move(glm::vec3(0.0f, 0.0f, -0.05f));
-            }
             modelList[0].move(glm::vec3(0.0f, 0.0f, 0.05f));
-            //y_mod -= .005f;
         }
     }
 
