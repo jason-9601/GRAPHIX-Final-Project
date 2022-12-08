@@ -97,7 +97,7 @@ int main(void)
 
     /* Variables for texture initialization */
     const int textures_count = 7;
-    const char* texture_filenames[textures_count] = { "3D/cat_texture.jpg", "3D/dolphin_texture.jpg",
+    const char* texture_filenames[textures_count] = { "3D/shark_texture.jpg", "3D/dolphin_texture.jpg",
     "3D/shark_texture.jpg", "3D/turtle_texture.jpg", "3D/angelfish_texture.jpg", "3D/coral_texture.jpg", 
     "3D/diver_texture.jpg" };
 
@@ -130,6 +130,22 @@ int main(void)
         glEnable(GL_DEPTH_TEST);
     }
 
+    /* Load the normal map */
+    GLuint norm_tex;
+    glGenTextures(1, &norm_tex);
+    glBindTexture(GL_TEXTURE_2D, norm_tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+    stbi_set_flip_vertically_on_load(true);
+
+    int img_width2, img_height2, color_channels2;
+    unsigned char* norm_bytes = stbi_load("3D/rock_normal.jpg", &img_width2, &img_height2, &color_channels2, 0);
+    /* https://www.filterforge.com/filters/1160-normal.jpg */
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_width2, img_height2, 0, GL_RGB, GL_UNSIGNED_BYTE, norm_bytes);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(norm_bytes);
+
     /* For keyboard events */
     /* TODO: The Player ship can be controlled using WASDQE */
     glfwSetKeyCallback(window, Key_Callback);
@@ -146,6 +162,9 @@ int main(void)
     Shader skyboxShader = Shader("Shaders/skybox.vert", "Shaders/skybox.frag");
     skyboxShader.useShaderProgram();
 
+    /* Shader object for ship with normal maps */
+    Shader normalShader = Shader("Shaders/normalmap.vert", "Shaders/normalmap.frag");
+   
     /* Vertices for the cube */
     float skyboxVertices[]{
         -1.f, -1.f, 1.f, //0
@@ -251,36 +270,36 @@ int main(void)
 
     std::vector<Model3D> modelList;
 
-    /* Create object for testing */
-    Model3D testObj = Model3D("3D/cat.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 270.0f);
+    /* Create main object, will be normal mapped. Set last parameter to true as it is normal mapped */
+    Model3D testObj = Model3D("3D/shark.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.04f, 0.04f, 0.04f, 270.0f, true);
     testObj.rotate_on_axis(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(testObj);
 
     /* https://free3d.com/3d-model/-dolphin-v1--12175.html */
-    Model3D dolphinObj = Model3D("3D/dolphin.obj", 0.0f, 5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f);
+    Model3D dolphinObj = Model3D("3D/dolphin.obj", 0.0f, 5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f, false);
     dolphinObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(dolphinObj);
 
     /* https://free3d.com/3d-model/shark-v2--367955.html */
-    Model3D sharkObj = Model3D("3D/shark.obj", 0.0f, 5.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f);
+    Model3D sharkObj = Model3D("3D/shark.obj", 0.0f, 5.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f, false);
     sharkObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(sharkObj);
 
     /* https://free3d.com/3d-model/-sea-turtle-v1--427786.html */
-    Model3D turtleObj = Model3D("3D/turtle.obj", 0.0f, -5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 90.0f);
+    Model3D turtleObj = Model3D("3D/turtle.obj", 0.0f, -5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 90.0f, false);
     turtleObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(turtleObj);
 
     /* https://free3d.com/3d-model/coral-beauty-angelfish-v1--473554.html */
-    Model3D angelfishObj = Model3D("3D/angelfish.obj", -5.0f, -7.0f, 0.0f, 0.0f, 0.0f, 1.0f, 2.0f, 2.0f, 2.0f, 90.0f);
+    Model3D angelfishObj = Model3D("3D/angelfish.obj", -5.0f, -7.0f, 0.0f, 0.0f, 0.0f, 1.0f, 2.0f, 2.0f, 2.0f, 90.0f, false);
     modelList.push_back(angelfishObj);
 
     /* https://free3d.com/3d-model/coral-v1--901825.html */
-    Model3D coralObj = Model3D("3D/coral.obj", 8.0f, -5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 90.0f);
+    Model3D coralObj = Model3D("3D/coral.obj", 8.0f, -5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 90.0f, false);
     modelList.push_back(coralObj);
 
     /* https://free3d.com/3d-model/aquarium-deep-sea-diver-v1--436500.html */
-    Model3D diverObj = Model3D("3D/diver.obj", 5.0f, -5.0f, -5.0f, 0.0f, 0.0f, 1.0f, 0.3f, 0.3f, 0.3f, 90.0f);
+    Model3D diverObj = Model3D("3D/diver.obj", 5.0f, -5.0f, -5.0f, 0.0f, 0.0f, 1.0f, 0.3f, 0.3f, 0.3f, 90.0f, false);
     modelList.push_back(diverObj);
 
     const int modelCount = 7;
@@ -290,8 +309,12 @@ int main(void)
     glGenVertexArrays(modelCount, VAO);
     glGenBuffers(modelCount, VBO);
 
-    /* Inititalize buffers for each obj in list */
-    for (int i = 0; i < modelCount; i++) {
+    /* Initialize buffers for main ship obj with normal maps */
+    glBindVertexArray(VAO[0]);
+    modelList[0].init_buffers_with_normals(VAO[0], VBO[0]);
+
+    /* Inititalize buffers for rest of obj in list */
+    for (int i = 1; i < modelCount; i++) {
         glBindVertexArray(VAO[i]);
         modelList[i].init_buffers(VAO[i], VBO[i]);
     }
@@ -345,7 +368,7 @@ int main(void)
         glDepthMask(GL_TRUE);
         glDepthFunc(GL_LEQUAL);
         
-        /* Render models, use the main shader files */
+        /* Set uniforms in main shader files */
         mainShader.useShaderProgram();
 
         // setting point light data
@@ -419,15 +442,77 @@ int main(void)
         GLuint texOAddress = glGetUniformLocation(mainShader.getID(), "tex0");
         glUniform1i(texOAddress, 0);
 
-        /* Draw submarine object / temporarily still a cat */
-        glBindTexture(GL_TEXTURE_2D, textures[0]);
+        /* Set uniforms in normal shader which will be used for rendering the ship */
+        normalShader.useShaderProgram();
+        /* Point light for normal shader*/
+        unsigned int normLightPosLoc = glGetUniformLocation(normalShader.getID(), "lightPos");
+        glUniform3fv(normLightPosLoc, 1, glm::value_ptr(plight.lightPos));
+        unsigned int normColorLoc = glGetUniformLocation(normalShader.getID(), "ourColor");
+        glUniform3fv(normColorLoc, 1, glm::value_ptr(glm::vec3(1, 1, 1)));
+        unsigned int normLightColorLoc = glGetUniformLocation(normalShader.getID(), "lightColor");
+        glUniform3fv(normLightColorLoc, 1, glm::value_ptr(plight.lightColor));
+        unsigned int normConstantLoc = glGetUniformLocation(normalShader.getID(), "constant");
+        glUniform1f(normConstantLoc, plight.constant);
+        unsigned int normLinearLoc = glGetUniformLocation(normalShader.getID(), "linear");
+        glUniform1f(normLinearLoc, plight.linear);
+        unsigned int normQuadraticLoc = glGetUniformLocation(normalShader.getID(), "quadratic");
+        glUniform1f(normQuadraticLoc, plight.quadratic);
+        unsigned int normAmbientStrLoc = glGetUniformLocation(normalShader.getID(), "ambientStr");
+        glUniform1f(normAmbientStrLoc, plight.ambientStr);
+        unsigned int normAmbientColorLoc = glGetUniformLocation(normalShader.getID(), "ambientColor");
+        glUniform3fv(normAmbientColorLoc, 1, glm::value_ptr(plight.ambientColor));
+        unsigned int normCameraPosLoc = glGetUniformLocation(normalShader.getID(), "cameraPos");
+        glUniform3fv(normCameraPosLoc, 1, glm::value_ptr(camera.Position));
+        unsigned int normSpecStrLoc = glGetUniformLocation(normalShader.getID(), "specStr");
+        glUniform1f(normSpecStrLoc, plight.specStr);
+        unsigned int normSpecPhogLoc = glGetUniformLocation(normalShader.getID(), "specPhong");
+        glUniform1f(normSpecPhogLoc, plight.specPhong);
+        /* Direction light for normal shader*/
+        unsigned int normDirlightPosLoc = glGetUniformLocation(normalShader.getID(), "direction");
+        glUniform3fv(normDirlightPosLoc, 1, glm::value_ptr(dlight.direction));
+        unsigned int normDirlightColorLoc = glGetUniformLocation(normalShader.getID(), "dirlightColor");
+        glUniform3fv(normDirlightColorLoc, 1, glm::value_ptr(dlight.lightColor));
+        unsigned int normDirambientStrLoc = glGetUniformLocation(normalShader.getID(), "dirambientStr");
+        glUniform1f(normDirambientStrLoc, dlight.ambientStr);
+        unsigned int normDirambientColorLoc = glGetUniformLocation(normalShader.getID(), "dirambientColor");
+        glUniform3fv(normDirambientColorLoc, 1, glm::value_ptr(dlight.ambientColor));
+        unsigned int normDirspecStrLoc = glGetUniformLocation(normalShader.getID(), "dirspecStr");
+        glUniform1f(normDirspecStrLoc, dlight.specStr);
+        unsigned int normDirspecPhogLoc = glGetUniformLocation(normalShader.getID(), "dirspecPhong");
+        glUniform1f(normDirspecPhogLoc, dlight.specPhong);
+        /* Rest of uniforms for normal shader */
+        unsigned int normProjectionLoc = glGetUniformLocation(normalShader.getID(), "projection");
+        glUniformMatrix4fv(normProjectionLoc, 1, GL_FALSE, glm::value_ptr(projection_matrix));
+        unsigned int normViewLoc = glGetUniformLocation(normalShader.getID(), "view");
+        glUniformMatrix4fv(normViewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+        unsigned int normTransformationLoc = glGetUniformLocation(normalShader.getID(), "transform");
+        GLuint normTexOAddress = glGetUniformLocation(normalShader.getID(), "tex0");
+        glUniform1i(normTexOAddress, 0);
+        GLuint normTex2Address = glGetUniformLocation(normalShader.getID(), "norm_tex");
+        glUniform1i(normTex2Address, 1);
+
+        /* Draw submarine object */
         glActiveTexture(GL_TEXTURE0);
-        modelList[0].draw(transformationLoc, 0, testObj.fullVertexData.size() / 8, VAO[0]);
+        glBindTexture(GL_TEXTURE_2D, textures[0]);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, norm_tex); 
+
+        modelList[0].draw(normTransformationLoc, 0, testObj.fullVertexData.size() / 8, VAO[0]);
+
+        /* Unbind textures */
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        /* Use main shader to draw rest of models */
+        mainShader.useShaderProgram();
 
         /* Draw rest of models in dolphin, shark, turtle, angelfish, coral, diver */
         for (int i = 1; i < modelList.size(); i++) {
-            glBindTexture(GL_TEXTURE_2D, textures[i]);
             glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, textures[i]);
             modelList[i].draw(transformationLoc, 0, modelList[i].fullVertexData.size() / 8, VAO[i]);
         }
   
