@@ -135,7 +135,7 @@ int main(void)
     /* Variables for texture initialization */
     const int textures_count = 7;
     const char* texture_filenames[textures_count] = { "3D/shark_texture.jpg", "3D/dolphin_texture.jpg",
-    "3D/shark_texture.jpg", "3D/turtle_texture.jpg", "3D/angelfish_texture.jpg", "3D/coral_texture.jpg", 
+    "3D/whale_texture.jpg", "3D/turtle_texture.jpg", "3D/angelfish_texture.jpg", "3D/coral_texture.jpg", 
     "3D/diver_texture.jpg" };
 
     int img_width, img_height, color_channels;
@@ -306,45 +306,41 @@ int main(void)
     stbi_set_flip_vertically_on_load(true);
 
     /* Create main object, will be normal mapped. Set last parameter to true as it is normal mapped */
-    Model3D mainObj = Model3D("3D/shark.obj", 0.0f, -10.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.03f, 0.03f, 0.03f, 270.0f, true);
+    /* https://free3d.com/3d-model/shark-v2--367955.html */
+    Model3D mainObj = Model3D("3D/shark.obj", 0.0f, -10.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.03f, 0.03f, 0.03f, 270.0f, true, 4.0f);
     mainObj.rotate_on_axis(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-
-    /* Create object for testing */
-    //Model3D testObj = Model3D("3D/cat.obj", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.01f, 0.01f, 0.01f, 270.0f, true);
-    //testObj.rotate_on_axis(90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-
     modelList.push_back(mainObj);
-
 
     /* MODELS AT DEPTH -20.0 */
 
     /* https://free3d.com/3d-model/-dolphin-v1--12175.html */
-    Model3D dolphinObj = Model3D("3D/dolphin.obj", 20.0f, -20.0f, 20.0f, 0.0f, 0.0f, 1.0f, 0.025f, 0.025f, 0.025f, 90.0f, false);
+    Model3D dolphinObj = Model3D("3D/dolphin.obj", 20.0f, -20.0f, 20.0f, 0.0f, 0.0f, 1.0f, 0.025f, 0.025f, 0.025f, 90.0f, false, 4.0f);
     dolphinObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(dolphinObj);
 
-    /* https://free3d.com/3d-model/shark-v2--367955.html */
-    Model3D sharkObj = Model3D("3D/shark.obj", -20.0f, -20.0f, 20.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f, false);
-    sharkObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-    modelList.push_back(sharkObj);
+    /* https://free3d.com/3d-model/whale-v4--501429.html */
+    Model3D whaleObj = Model3D("3D/whale.obj", -20.0f, -20.0f, -20.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f, false, 7.0f);
+    whaleObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    modelList.push_back(whaleObj);
 
     /* https://free3d.com/3d-model/-sea-turtle-v1--427786.html */
-    Model3D turtleObj = Model3D("3D/turtle.obj", -10.0f, -20.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.04f, 0.04f, 0.04f, 90.0f, false);
+    Model3D turtleObj = Model3D("3D/turtle.obj", -10.0f, -20.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.05f, 0.05f, 0.05f, 90.0f, false, 4.0f);
     turtleObj.rotate_on_axis(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(turtleObj);
 
     /* MODELS AT DEPTH -30.0 */
 
     /* https://free3d.com/3d-model/coral-beauty-angelfish-v1--473554.html */
-    Model3D angelfishObj = Model3D("3D/angelfish.obj", 0.0f, -30.0f, 10.0f, 0.0f, 0.0f, 1.0f, 2.0f, 2.0f, 2.0f, 90.0f, false);
+    Model3D angelfishObj = Model3D("3D/angelfish.obj", 0.0f, -30.0f, 10.0f, 0.0f, 0.0f, 1.0f, 2.0f, 2.0f, 2.0f, 90.0f, false, 4.0f);
+    angelfishObj.rotate_on_axis(2.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(angelfishObj);
 
     /* https://free3d.com/3d-model/coral-v1--901825.html */
-    Model3D coralObj = Model3D("3D/coral.obj", -10.0f, -30.0f, 20.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 90.0f, false);
+    Model3D coralObj = Model3D("3D/coral.obj", -10.0f, -30.0f, 20.0f, 0.0f, 0.0f, 1.0f, 0.1f, 0.1f, 0.1f, 90.0f, false, 4.0f);
     modelList.push_back(coralObj);
 
     /* https://free3d.com/3d-model/aquarium-deep-sea-diver-v1--436500.html */
-    Model3D diverObj = Model3D("3D/diver.obj", 20.0f, -30.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.3f, 0.3f, 0.3f, 90.0f, false);
+    Model3D diverObj = Model3D("3D/diver.obj", 20.0f, -30.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.3f, 0.3f, 0.3f, 90.0f, false, 4.0f);
     modelList.push_back(diverObj);
 
     const int modelCount = 7;

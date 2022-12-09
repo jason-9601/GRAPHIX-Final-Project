@@ -24,7 +24,7 @@ tinyobj::attrib_t attributes;
 
 Model3D::Model3D(const char* path, float _x, float _y, float _z,
     float _rot_x, float _rot_y, float _rot_z,
-    float _scale_x, float _scale_y, float _scale_z, float _theta, bool has_normal_maps) {
+    float _scale_x, float _scale_y, float _scale_z, float _theta, bool has_normal_maps, float box_offset) {
     this->x = _x;
     this->y = _y;
     this->z = _z;
@@ -36,6 +36,7 @@ Model3D::Model3D(const char* path, float _x, float _y, float _z,
     this->scale_z = _scale_z;
     this->theta = _theta;
     this->has_normal_maps = has_normal_maps;
+    this->box_offset = box_offset;
 
     init_transformation_matrix();
 
@@ -237,7 +238,7 @@ void Model3D::move(glm::vec3 movePos, std::vector<Model3D> modelList) {
     }
 
     for (int i = 1; i < modelList.size(); i++) {
-        if (checkCollision(matrix_after_move, modelList[i].transformation_matrix) == true) {
+        if (checkCollision(matrix_after_move, modelList[i].transformation_matrix, modelList[i].box_offset) == true) {
             std::cout << "has collided with model: " << i << "\n";
             return;
         }
@@ -256,9 +257,7 @@ void Model3D::printDepth() {
     std::cout << "Depth of Main Object is " << this->transformation_matrix[3][1] << "\n"; // for testing //
 }
 
-bool Model3D::checkCollision(glm::mat4 myPosition, glm::mat4 possibleCollisionPosition) {
-
-    float offset = 4.0f;
+bool Model3D::checkCollision(glm::mat4 myPosition, glm::mat4 possibleCollisionPosition, float offset) {
 
     bool x_axis_collision = myPosition[3][0] + offset >= possibleCollisionPosition[3][0] && 
                       possibleCollisionPosition[3][0] + offset >= myPosition[3][0];
