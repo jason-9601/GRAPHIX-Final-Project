@@ -689,5 +689,15 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     lastX = xpos;
     lastY = ypos;
 
+    /* Drag map on click for orthographic top view */
+    if (isOrtho) {
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        {
+            camera.Position.x += xoffset * 0.5f;
+            camera.Position.y += yoffset * -2.0f;
+        }
+        return;
+    }
+
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
