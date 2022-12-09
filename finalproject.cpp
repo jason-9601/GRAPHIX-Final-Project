@@ -15,6 +15,7 @@
 #include "Model3D.h"
 #include "MyCamera.h"
 #include "Light.h"
+#include "Player.h"
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow* window);
@@ -307,7 +308,7 @@ int main(void)
 
     /* Create main object, will be normal mapped. Set last parameter to true as it is normal mapped */
     /* https://free3d.com/3d-model/shark-v2--367955.html */
-    Model3D mainObj = Model3D("3D/shark.obj", 0.0f, -10.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.03f, 0.03f, 0.03f, 270.0f, true, 4.0f);
+    Player mainObj = Player("3D/shark.obj", 0.0f, -10.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.03f, 0.03f, 0.03f, 270.0f, true, 4.0f);
     mainObj.rotate_on_axis(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     modelList.push_back(mainObj);
 

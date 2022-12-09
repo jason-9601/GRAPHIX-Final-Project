@@ -136,6 +136,7 @@
     <ClCompile Include="finalproject.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Model3D.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>

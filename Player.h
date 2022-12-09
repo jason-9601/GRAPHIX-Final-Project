@@ -1,16 +1,20 @@
-// The Player ship can be controlled using WASDQE 
+#pragma once
 
-//  W / S – Forward / Back (z)
-//  A / D – Turn Left / Right (x)
-//  Q / E – Ascend / Descend (y -- check note below abt sub and y-axis)
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
-// Sub can only be controlled when in 1st / 3rd Person view
-// Sub cannot go above 0 in the Y axis
-// Print out the current depth the sub is in the console window using cout
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-// DUMPING OF IDEAS 
-// key movement control -- WASDQE CODITIONAL IF 1ST/3RD PERSON ON MAIN MODEL OBJ
-// (note: sub cannot go above 0 in Y Axis): start position y-axis negative 
-// -- check other classes to ensure no overlap ++ make either (1) condition that if y-axis reach 0 not move OR (2) make world/cam extend only up to y-axis 0 ??? 2x check this
+#include "Model3D.h"
 
-// PRINT CURRENT COORD -- Search for similar concept i found on youtube before regardin
+class Player : public Model3D {
+
+public:
+
+    Player(const char* path, float x, float y, float z,
+        float rot_x, float rot_y, float rot_z,
+        float scale_x, float scale_y, float scale_z, float theta, bool has_normal_maps, float box_offset);
+
+};
