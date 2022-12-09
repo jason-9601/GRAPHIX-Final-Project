@@ -239,7 +239,7 @@ void Model3D::move(glm::vec3 movePos, std::vector<Model3D> modelList) {
 
     for (int i = 1; i < modelList.size(); i++) {
         if (checkCollision(matrix_after_move, modelList[i].transformation_matrix, modelList[i].box_offset) == true) {
-            std::cout << "has collided with model: " << i << "\n";
+           // std::cout << "has collided with model: " << i << "\n";
             return;
         }
     }
@@ -253,8 +253,8 @@ void Model3D::scale(glm::vec3 scaleModel) {
 
 void Model3D::printDepth() {
    
-    //std::cout << "Depth of Main Object is " << this->transformation_matrix[3][1] << ".\r";
-    std::cout << "Depth of Main Object is " << this->transformation_matrix[3][1] << "\n"; // for testing //
+    std::cout << "Depth of Main Object is " << this->transformation_matrix[3][1] << ".\r";
+   // std::cout << "Depth of Main Object is " << this->transformation_matrix[3][1] << "\n"; // for testing //
 }
 
 bool Model3D::checkCollision(glm::mat4 myPosition, glm::mat4 possibleCollisionPosition, float offset) {
@@ -267,9 +267,11 @@ bool Model3D::checkCollision(glm::mat4 myPosition, glm::mat4 possibleCollisionPo
 
     bool has_collided = x_axis_collision && y_axis_collision;
 
+    /*
     if (has_collided) {
         std::cout << "COLISSION OCCURED";
     }
+    */
 
     return has_collided;
 }
