@@ -611,7 +611,25 @@ void processInput(GLFWwindow* window)
         
     }
 
-    if (isPers) {
+    if (isOrtho) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            camera.Position.z += .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            camera.Position.x += .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            camera.Position.z -= .005f;
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            camera.Position.x -= .005f;
+        }
+    }
+    else if (isOrtho == false) {
+        camera.Position.x = modelList[0].transformation_matrix[3][0];
+        camera.Position.y = modelList[0].transformation_matrix[3][1];
+        camera.Position.z = modelList[0].transformation_matrix[3][2];
+
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
         {
             modelList[0].move(glm::vec3(-1.0f * submarine_speed, 0.0f, 0.0f), modelList);
@@ -631,33 +649,13 @@ void processInput(GLFWwindow* window)
         }
 
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) // descend
-        {   
+        {
             modelList[0].move(glm::vec3(0.0f, 0.0f, -1.0f * submarine_speed), modelList);
         }
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) // ascend
         {
             modelList[0].move(glm::vec3(0.0f, 0.0f, submarine_speed), modelList);
         }
-    }
-
-    if (isOrtho) {
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            camera.Position.z += .005f;
-        }
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            camera.Position.x += .005f;
-        }
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            camera.Position.z -= .005f;
-        }
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            camera.Position.x -= .005f;
-        }
-    }
-    else if (isOrtho == false) {
-        camera.Position.x = modelList[0].transformation_matrix[3][0];
-        camera.Position.y = modelList[0].transformation_matrix[3][1];
-        camera.Position.z = modelList[0].transformation_matrix[3][2];
     }
 
 }
