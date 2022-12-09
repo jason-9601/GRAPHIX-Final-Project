@@ -23,6 +23,7 @@ public:
     float scale_x, scale_y, scale_z; // scale
     float theta;
     bool has_normal_maps;
+    float box_offset;
 
     glm::mat4 transformation_matrix;
     std::vector<GLuint> mesh_indices;
@@ -30,7 +31,7 @@ public:
 
     Model3D(const char* path, float x, float y, float z,
         float rot_x, float rot_y, float rot_z,
-        float scale_x, float scale_y, float scale_z, float theta, bool has_normal_maps);
+        float scale_x, float scale_y, float scale_z, float theta, bool has_normal_maps, float box_offset);
 
     void init_data_regular();
 
@@ -52,7 +53,7 @@ public:
 
     void printDepth();
 
-    bool checkCollision(glm::mat4 myPosition, glm::mat4 possibleCollisionPosition);
+    bool checkCollision(glm::mat4 myPosition, glm::mat4 possibleCollisionPosition, float offset);
 
     void init_buffers(unsigned int VAO, unsigned int VBO);
 
