@@ -699,5 +699,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
         return;
     }
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    if (isPers or isOrtho) {
+        camera.ProcessMouseMovement(xoffset, yoffset);
+    }
 }
